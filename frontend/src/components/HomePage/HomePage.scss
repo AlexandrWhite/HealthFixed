@@ -1,0 +1,53 @@
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Разделяет элементы по краям */
+    align-items: center; /* Выравнивает элементы по вертикали */
+    background-color: #f8f9fa; /* Светлый фон для navbar */
+    padding: 10px 20px; /* Отступы внутри navbar */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Тень для эффекта */
+}
+.navbar-left {
+    display: flex;
+    align-items: center; /* Выравнивает элементы по вертикали */
+    justify-content: space-between;
+}
+
+.navbar-left > div{
+    margin: 5px;
+}
+
+.arrow-list{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.navbar-right {
+    display: flex;
+    justify-content: space-around;
+}
+
+.sub-nav{
+    display: flex;
+    min-height: 35px;
+    background-color: rgb(194, 250, 139);
+}
+
+.navbar-right > div {
+    margin: 5px;
+}
+
+.search-element{
+   
+    display: flex;
+    flex-direction: row;
+    gap:10px;
+}
+
+.journal{    
+    margin: 15px;
+}
+
+.search-input{
+    width: 50%;
+}

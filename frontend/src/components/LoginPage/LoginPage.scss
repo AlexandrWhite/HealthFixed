@@ -1,0 +1,35 @@
+@use '../../styles/variables.scss' as variables;
+
+$block: '.login-page';
+
+
+#{$block} {
+    height:100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    justify-content: center; /* Center horizontally */
+
+    &__alert{
+        margin-top: 30px;
+    }
+
+    &__header{
+        
+        margin: 5px;
+        margin-bottom: 20px;
+    }
+   
+    &__text-input{
+        margin: 5px;
+    }
+
+    &__login-btn{
+        margin-top: 20px;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+
+}
