@@ -332,6 +332,7 @@ export const PatientPage: React.FC = () =>{
         <Select.Option value="3">D58.1 Наследственный эллиптоцитоз</Select.Option>
         <Select.Option value="4">D58.8 Другие уточненные наследственные гемолитические анемии</Select.Option>
         <Select.Option value="5">D58.9 Наследственная гемолитическая анемия неуточненная</Select.Option>
+        <Select.Option value="6">Наследственность отсутствует</Select.Option>
     </Select>
 
 
@@ -669,7 +670,7 @@ const planStr = `Приём (осмотр, консультация) врача 
                                 </Modal>
                             </Settings.Item>
 
-                            <Settings.Item title="Клинический диагноз">
+                            <Settings.Item title="Основной диагноз">
                                 <div style={{ width:370, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: "10px" }}>
                                     <TextInput/>
                                 </div>                                
@@ -683,7 +684,7 @@ const planStr = `Приём (осмотр, консультация) врача 
                                 {patientStateSelect}
                             </Settings.Item>
 
-                            <Settings.Item title="Основной диагноз">
+                            <Settings.Item title="Диагноз системы">
                                 <Settings.Section title="">
                                     <div style={{ width:370, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: "10px" }}>
                                         <TextInput value={aiDiagnose ?? ""}   onUpdate={(value) => {setAiDiagnose(value)}}/>
@@ -728,7 +729,7 @@ const planStr = `Приём (осмотр, консультация) врача 
                                 {uziSelect}
                             </Settings.Item>
 
-                            <Settings.Item title="Наследставенность">
+                            <Settings.Item title="Наследственность">
                                 {nasledSelect}
                             </Settings.Item>
                             
