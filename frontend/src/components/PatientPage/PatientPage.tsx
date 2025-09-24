@@ -25,7 +25,7 @@ export const PatientPage: React.FC = () =>{
     const [open, setOpen] = useState(false);
     const doctorName = location.state?.name; 
     const [aiDiagnose, setAiDiagnose] = useState<string | undefined>(undefined);
-
+    const [baseDiagnose, setBaseDiagnose] = useState<string | undefined>(undefined);
     const {add} = useToaster();
     const {removeAll} = useToaster();
 
@@ -101,31 +101,7 @@ export const PatientPage: React.FC = () =>{
         })
     }
 
-    const getDocument = () => {
-        axios.get(BACKEND_URL+'api/get_document/', {
-            responseType: 'blob',
-            params: {
-                "doctor":doctorName,
-                "tap": analysis["Kumbs"].tapID,
-                "pol" : curPatient['gender'],
-                "ves" : weightValue,
-                "travma" : travmaValue,
-                "onko": onkoValue,
-                "infec": infecValue,
-                "uzi": uziValue,
-                "nasled": nasledValue
-            }
-        }).then((response)=>{
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'Отчёт.docx'); // Указываем имя файла
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link); // Удаляем ссылку после скачивания
-            //setAiDiagnose(res.data.result);
-        })
-    }
+    
 
     const formatPhoneNumber = (number) => {
         const cleaned = ('' + number).replace(/\D/g, '');
@@ -210,9 +186,45 @@ export const PatientPage: React.FC = () =>{
         } 
     }
 
+    function onCloseClick(e){
+        if (check_values()){
+            navigate('/home')
+        }
+    }
+
     function onPredictClick(e){
         if (check_values()){
             getPredict()
+        }
+    }
+
+    const getDocument = () => {
+        if (check_values()){
+            axios.get(BACKEND_URL+'api/get_document/', {
+                responseType: 'blob',
+                params: {
+                    "doctor":doctorName,
+                    "tap": analysis["Kumbs"].tapID,
+                    "pol" : curPatient['gender'],
+                    "ves" : weightValue,
+                    "travma" : travmaValue,
+                    "onko": onkoValue,
+                    "infec": infecValue,
+                    "uzi": uziValue,
+                    "nasled": nasledValue,
+                    "system_diag": aiDiagnose,
+                    "base_diag": baseDiagnose
+                }
+            }).then((response)=>{
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'Отчёт.docx'); // Указываем имя файла
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link); // Удаляем ссылку после скачивания
+                //setAiDiagnose(res.data.result);
+            })
         }
     }
 
@@ -698,7 +710,7 @@ const planStr = `Приём (осмотр, консультация) врача 
 
                             <Settings.Item title="Основной диагноз">
                                 <div style={{ width:370, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: "10px" }}>
-                                    <TextInput/>
+                                    <TextInput value={baseDiagnose ?? ""}   onUpdate={(value) => {setBaseDiagnose(value)}}/>
                                 </div>                                
                             </Settings.Item>
 
@@ -728,9 +740,9 @@ const planStr = `Приём (осмотр, консультация) врача 
                                 view="outlined-info"
                                 children="Получить  справку"
                                 size="l"/>
-                                
+
                             <Button 
-                                onClick={check_values}
+                                onClick={onCloseClick}
                                 view="outlined-success" 
                                 children="Закрыть случай" 
                                 size="l"/>

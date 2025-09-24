@@ -189,6 +189,10 @@ def get_document(request):
     doc.add_paragraph('Дата посещения: '+date)
     
     doc.add_paragraph('ФИО врача: '+request.GET.get('doctor'))
+
+    doc.add_paragraph('Основной диагноз: '+request.GET.get('base_diag'))
+    doc.add_paragraph('Диагноз системы: '+request.GET.get('system_diag'))
+
     # doc.add_paragraph('Диагноз: '+date)
     names2 = [
         'Пол',
