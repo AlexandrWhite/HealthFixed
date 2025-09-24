@@ -101,6 +101,32 @@ export const PatientPage: React.FC = () =>{
         })
     }
 
+    const getDocument = () => {
+        axios.get(BACKEND_URL+'api/get_document/', {
+            responseType: 'blob',
+            params: {
+                "doctor":doctorName,
+                "tap": analysis["Kumbs"].tapID,
+                "pol" : curPatient['gender'],
+                "ves" : weightValue,
+                "travma" : travmaValue,
+                "onko": onkoValue,
+                "infec": infecValue,
+                "uzi": uziValue,
+                "nasled": nasledValue
+            }
+        }).then((response)=>{
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'Отчёт.docx'); // Указываем имя файла
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link); // Удаляем ссылку после скачивания
+            //setAiDiagnose(res.data.result);
+        })
+    }
+
     const formatPhoneNumber = (number) => {
         const cleaned = ('' + number).replace(/\D/g, '');
         // Проверяем, что номер состоит из 10 цифр
@@ -676,14 +702,6 @@ const planStr = `Приём (осмотр, консультация) врача 
                                 </div>                                
                             </Settings.Item>
 
-                            <Settings.Item title="Характер заболевания">
-                                {natureDeseaseSelect}
-                            </Settings.Item>
-
-                            <Settings.Item title="Состояние пациента" id="patientItem">
-                                {patientStateSelect}
-                            </Settings.Item>
-
                             <Settings.Item title="Диагноз системы">
                                 <Settings.Section title="">
                                     <div style={{ width:370, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: "10px" }}>
@@ -693,6 +711,29 @@ const planStr = `Приём (осмотр, консультация) врача 
                                 </Settings.Section>                                
                             </Settings.Item>
 
+                            <Settings.Item title="Характер заболевания">
+                                {natureDeseaseSelect}
+                            </Settings.Item>
+
+                            <Settings.Item title="Состояние пациента" id="patientItem">
+                                {patientStateSelect}
+                            </Settings.Item>
+
+                            {/* //TODO 
+                            Сделать отчет 
+                            Закрыть случай */}
+
+                            <Button
+                                onClick={getDocument}  
+                                view="outlined-info"
+                                children="Получить  справку"
+                                size="l"/>
+                                
+                            <Button 
+                                onClick={check_values}
+                                view="outlined-success" 
+                                children="Закрыть случай" 
+                                size="l"/>
                         </Settings.Section>
                     </Settings.Page>
 

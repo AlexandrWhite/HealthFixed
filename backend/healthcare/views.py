@@ -6,6 +6,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.contrib.sessions.models import Session
 from rest_framework.renderers import JSONRenderer
+from django.http import FileResponse
 
 from .serializers import PatientSerializer
 from .serializers import VisitSerializer
@@ -173,4 +174,177 @@ def diagnose_predict(request):
         result = codes[res[0]-1]
 
     return JsonResponse({'result':result})
+
+
+def get_document(request):
+    from docx import Document
+    from datetime import datetime;
+
+    now = datetime.now()
+
+    date = str(now.day)+"."+str(now.month)+"."+str(now.year)
+
+    doc = Document()
+    doc.add_heading('Отчёт о посещении', level=1)
+    doc.add_paragraph('Дата посещения: '+date)
+    
+    doc.add_paragraph('ФИО врача: '+request.GET.get('doctor'))
+    # doc.add_paragraph('Диагноз: '+date)
+    names2 = [
+        'Пол',
+        'Вес',
+        'Наличие кровотечения',
+        'Наличие на момент обследования восполительных заболеваний, онкологий',
+        'Инфекции, переливание крови, отравление, интоксикация',  
+        'Результат ультразвукового исследования'
+        'Исследование уровня общего гемоглобина в крови',
+        'Исследование уровня эритроцитов в крови',
+        'Исследование уровня лейкоцитов в крови',
+        'Исследование уровня тромбоцитов в крови',
+        'Оценка гематокрита',
+        'Определение среднего содержания гемоглобина в эритроцитах MCH',
+        'Средняя концентрация гемоглобина в (MCHC)',
+        'Средний объем эритроцитов MCV',
+        'Цветовой  показатель',
+        'Исследование уровня железа в сыворотки крови',
+        'Исследование железосвязывающей способности сыворотки (ОЖСС)',
+        'Исследование уровня ферритина в крови',
+        'Определение уровня витамина B12 (цианокобаламин) в крови',
+        'Исследование уровня общего билирубина в крови',
+        'Исследование уровня общего белка в крови',
+        'Исследование уровня фолиевой кислоты в сыворотке крови',
+        'Исследование уровня альбумина в крови',
+        'Цитологическое исследование мазка костного мозга (миелограмма)',
+        'Прямой антиглобулиновый тест (прямая проба Кумбса)'
+    ]
+
+    normals = [
+        '-',
+        '-',
+        '-',
+        '-',
+        '-',
+        '-',
+        '120-140 (ж), '+'135-160 (м)',
+        '3,9-4,7 (ж), '+'4-5 (м)',
+        '4-9',
+        '150-400',
+        '36-42 (ж),  '+'40-41 (м)',
+        '24-34',
+        '300-380',
+        '75-95',
+        'Вычисляется по формуле MCH*0,03 (формулу выводить на экран не надо)',
+        '6,6 – 26',
+        '11 – 28',
+        '45,3-77,1',
+        '10-120 (М)  ' +'20-250 (Ж)',
+        '197-771',
+        '2-21',
+        '65-85',
+        '3 - 17',
+        '35-53',
+        '0 - норма  '+'1-угнетение более 2-х ростков  '+'  0,5 - изолированное угнетение красного ростка',
+        '0-отриц'
+    ]
+
+    units = [
+        '-',
+        '-',
+        '-',
+        '-',
+        '-',
+        '-',
+        '-',
+        '*10^12 на л (м)',
+        '*10^9/л',
+        '*10^9/л',
+        '-',
+        '-',
+        '-',
+        '-',
+        '-',
+        'мкмоль/л',
+        'мкмоль/л',
+        'мкг/л',
+        'пг/мл',
+        'мкмоль/л',
+        'г/л',
+        'нг/мл',
+        'г/л',
+        '-',
+        '-'
+    ]
+
+    
+
+
+    pol = request.GET.get('pol')
+    ves = request.GET.get('ves')
+    travma = request.GET.get('travma')
+
+    visits = Visit.objects.filter(tapID=request.GET.get("tap"))
+    analyses = {}
+    for visit in visits:
+        analyses[visit.investigationName] = visit.investigationResult
+
+
+    patient_values = [
+        pol, #Пол
+        ves, #Вес
+        "Да" if request.GET.get('travma')=='1' else "Нет", #травма 
+        "Да" if request.GET.get('onko') else "Нет", #онко +
+        "Да" if request.GET.get('infec') else "Нет", #инфекция +  
+        "Отклонения есть" if request.GET.get('uzi') else "Отклонений нет", #узи +
+        # "Да" if request.GET.get('nasled') else "Нет", #наследст +
+        analyses["HGB"], #HGB Исследование уровня общего гемоглобина в крови
+        analyses["erit"], # erit Исследование уровня эритроцитов в крови
+        analyses["leik"], # leik Исследование уровня лейкоцитов в крови
+        analyses["PLT"], #PLT Исследование уровня тромбоцитов в крови
+        analyses["gematok"], #gematok Оценка гематокрита
+        analyses["MCH"], #MCH Определение среднего содержания гемоглобина в эритроцитах (MCH)	
+        analyses["MCHC"],	#MCHC Средняя концентрация гемоглобина в эритроцитах (MCHC)
+        analyses["MCV"], #MCV Средний объем эритроцитов (MCV)
+        analyses["pokazatel"], #Цветовой показатель
+        analyses["Fe"], #Fe Исследование уровня железа в сыворотке крови
+        analyses["OZSS"], #OZSS Исследование железосвязывающей способности сыворотки (ОЖСС)
+        analyses["Ferrit"], #Ferrit Исследование уровня ферритина в крови
+        analyses["B12"], #B12 Определение уровня витамина B12 (цианокобаламин) в крови
+        analyses["billirubin"], #billirubin Исследование уровня общего билирубина в крови
+        analyses["belok"], #belok Исследование уровня общего белка в крови
+        analyses["folievay"], #folievay Исследование уровня фолиевой кислоты в сыворотке крови
+        analyses["albumin"], #albumin Исследование уровня альбумина в крови
+        analyses["mielogramma"], #mielogramma (миелограмма)
+        analyses["Kumbs"] #Прямой антиглобулиновый тест (прямая проба Кумбса) 
+    ] 
+
+
+    table = doc.add_table(rows=len(names2)+1, cols=4)
+    table.style = 'Table Grid'
+
+    hdr_cells = table.rows[0].cells
+    hdr_cells[0].text = 'Данные'
+    hdr_cells[1].text = 'Норма'
+    hdr_cells[2].text = 'Ед. измерения'
+    hdr_cells[3].text = 'Пациент'
+
+    print(len(names2)+1)
+    for i in range(1, len(names2)+1):
+        row_cells = table.rows[i].cells
+        row_cells[0].text = names2[i-1]
+        row_cells[1].text = normals[i-1]
+        row_cells[2].text = units[i-1]
+        if patient_values[i-1] is None:
+            row_cells[3].text = ""
+        else:
+            row_cells[3].text = patient_values[i-1]
+        
+
+    doc.save('backend/documents/order.docx')
+    file_path = "backend/documents/order.docx"
+
+  
+    response = FileResponse(open(file_path, 'rb'), as_attachment=True, filename='PatientResult.docx')
+    # response['Content-Disposition'] = 'attachment; filename="name.docx"'
+    return response 
+
     
