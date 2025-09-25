@@ -169,7 +169,7 @@ def diagnose_predict(request):
     
 
     with open("ml/model.pkl", "rb") as f:
-        model = loaded_model = pickle.load(f)
+        model = pickle.load(f)
         res = model.predict(array)
         result = codes[res[0]-1]
 

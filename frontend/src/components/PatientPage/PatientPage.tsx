@@ -738,7 +738,7 @@ const planStr = `Приём (осмотр, консультация) врача 
                             <Button
                                 onClick={getDocument}  
                                 view="outlined-info"
-                                children="Получить  справку"
+                                children="Отчет"
                                 size="l"/>
 
                             <Button 
